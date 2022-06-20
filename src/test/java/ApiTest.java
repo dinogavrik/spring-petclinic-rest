@@ -33,18 +33,12 @@ public class ApiTest {
 	@BeforeAll
 	public static void setUpAuth() {
 
-		PreemptiveBasicAuthScheme authScheme = new PreemptiveBasicAuthScheme();
-		authScheme.setUserName("admin");
-		authScheme.setPassword("admin");
-
-		RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
 
 		RestAssured.filters(new RequestLoggingFilter(), new ResponseLoggingFilter());
 
 		RestAssured.requestSpecification = new RequestSpecBuilder()
 			//.setBaseUri("localhost:8080")
 			.setContentType(ContentType.JSON)
-			.setAuth(authScheme)
 			.build();
 
 
@@ -78,8 +72,49 @@ public class ApiTest {
 			PreparedStatement sql3 = connection.prepareStatement("delete from owners where id = 11;");
 			sql3.executeUpdate();
 
+		}
+
+		@Test
+		public void PostOwnersSuccess() throws SQLException {
+			given()
+				.body("{\n" +
+					"  \"address\": \"len 2\",\n" +
+					"  \"city\": \"London\",\n" +
+					"  \"firstName\": \"Lolla\",\n" +
+					"  \"lastName\": \"Lollovna\",\n" +
+					"  \"pets\": [\n" +
+					"    {\n" +
+					"      \"birthDate\": \"2022-06-20\",\n" +
+					"      \"name\": \"Petya\",\n" +
+					"      \"visits\": [\n" +
+					"        {\n" +
+					"          \"date\": \"2022-06-20\",\n" +
+					"          \"description\": \"как-то так\"\n" +
+					"        }\n" +
+					"      ]\n" +
+					"    }\n" +
+					"  ],\n" +
+					"  \"telephone\": \"93463794\"\n" +
+					"}")
+				.when()
+				.post("/owners")
+				.then()
+				.statusCode(201)
+				.body("firstName", is("Lolla"),
+					"city", is("London"),
+					"pets", notNullValue(),
+					"pets[0].name", is("Petya"),
+					"pets[0].visits[0].description", is("как-то так")
+					);
 
 
+
+			PreparedStatement sql3 = connection.prepareStatement("delete from visits where description = 'как-то так';");
+			sql3.executeUpdate();
+			PreparedStatement sql2 = connection.prepareStatement("delete from pets where name = 'Petya';");
+			sql2.executeUpdate();
+			PreparedStatement sql1 = connection.prepareStatement("delete from owners where first_name = 'Lolla';");
+			sql1.executeUpdate();
 
 		}
 	}
