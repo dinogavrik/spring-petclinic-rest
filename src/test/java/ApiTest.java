@@ -1,3 +1,5 @@
 public class ApiTest {
-	private void lol(){}
+	private void lol(){
+		String i = "";
+	}
 }
