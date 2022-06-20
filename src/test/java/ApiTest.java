@@ -19,6 +19,7 @@ import java.sql.SQLException;
 import static io.restassured.RestAssured.given;
 
 public class ApiTest {
+	//аааааааа
 	private static Connection connection;
 	@BeforeAll
 	public static void setConnection() throws SQLException {
